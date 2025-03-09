@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using BlazorState.Test.Web.Store.States
+@inject CustomerState CustomerState
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">BlazorState.Test.Web</a>
     </div>
@@ -25,6 +28,21 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
             </NavLink>
         </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Usuario: @(CustomerState.FirstName + " " + CustomerState.LastName)
+            </NavLink>
+        </div>
     </nav>
 </div>
 
+@code{
+    protected override void OnInitialized()
+    {
+        CustomerState.SubscribeToAnyChange(() =>
+        {            
+            StateHasChanged();
+        });
+    }
+}
