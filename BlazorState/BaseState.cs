@@ -1,5 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace BlazorState
 {
@@ -8,28 +9,68 @@ namespace BlazorState
     /// This class is designed to facilitate state management in your Blazor application by leveraging
     /// the CommunityToolkit.Mvvm library for property change notifications.
     /// 
-    /// The <see cref="BaseState{T}"/> class inherits from <see cref="ObservableObject"/>, which implements
-    /// the <see cref="INotifyPropertyChanged"/> interface. This allows derived state classes to notify
-    /// the UI of property changes, enabling reactive and efficient state updates.
+    /// The <see cref="BaseState{T}"/> class implements the <see cref="INotifyPropertyChanged"/> interface.
+    /// This allows derived state classes to notify the UI of property changes, enabling reactive and efficient state updates.
     /// 
     /// Example usage:
     /// <code>
     /// public class CustomerState : BaseState&lt;CustomerState&gt;
     /// {
-    ///     [ObservableProperty]
     ///     private string firstName;
+    ///     public string FirstName
+    ///     {
+    ///         get => firstName;
+    ///         set
+    ///         {
+    ///             if (firstName != value)
+    ///             {
+    ///                 firstName = value;
+    ///                 NotifyPropertyChanged();
+    ///             }
+    ///         }
+    ///     }
     /// 
-    ///     [ObservableProperty]
     ///     private string lastName;
+    ///     public string LastName
+    ///     {
+    ///         get => lastName;
+    ///         set
+    ///         {
+    ///             if (lastName != value)
+    ///             {
+    ///                 lastName = value;
+    ///                 NotifyPropertyChanged();
+    ///             }
+    ///         }
+    ///     }
     /// }
     /// 
     /// var customerState = new CustomerState();
-    /// customerState.SubscribeToPropertyChange(state => state.FirstName, StateHasChanged -> Is method from blazor component);
+    /// customerState.SubscribeToPropertyChange(state => state.FirstName, StateHasChanged);
     /// </code>
     /// </summary>
     /// <typeparam name="T">The type of the derived state class.</typeparam>
-    public class BaseState<T> : ObservableObject
+    public class BaseState<T> : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public virtual void NotifyPropertyChanged([CallerMemberName] string callerMemberName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(callerMemberName));
+        }
+
+        /// <summary>
+        /// Subscribes to any property change in the state.
+        /// </summary>
+        /// <param name="callback">The callback to invoke when any property changes.</param>
+        public void SubscribeToAnyChange(Action callback)
+        {
+            PropertyChanged += (sender, e) =>
+            {
+                callback();
+            };
+        }
+
         /// <summary>
         /// Subscribes to property changes for a specified property.
         /// </summary>

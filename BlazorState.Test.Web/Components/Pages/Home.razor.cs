@@ -14,7 +14,7 @@ namespace BlazorState.Test.Web.Components.Pages
         bool ShowWeaterComponent = false;
         protected override void OnInitialized()
         {
-            CustomerState.SubscribeToPropertyChange(e => e.FirstName, StateHasChanged);
+            CustomerState.SubscribeToAnyChange(StateHasChanged);
 
             base.OnInitialized();
         }

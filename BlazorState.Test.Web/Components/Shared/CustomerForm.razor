@@ -18,6 +18,21 @@
         firstName = CustomerState.FirstName;
         lastName = CustomerState.LastName;
 
+        CustomerState.SubscribeToAnyChange(() =>
+        {
+            if (string.IsNullOrEmpty(CustomerState.FirstName) == false)
+            {
+                firstName = CustomerState.FirstName;
+            }
+
+            if (string.IsNullOrEmpty(CustomerState.LastName) == false)
+            {
+                lastName = CustomerState.LastName;
+            }
+            
+            StateHasChanged();
+        });
+
         base.OnInitialized();
     }
 
@@ -32,7 +47,5 @@
         {
             CustomerState.LastName = lastName;
         }
-        
-        
     }
 }

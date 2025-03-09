@@ -4,16 +4,15 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>EJEMPLO DE MANEJO DE ESTADO EN BLAZOR</h1>
 
-Welcome to your new app.
+<h1>Usuario: @(CustomerState.FirstName + " " + CustomerState.LastName)</h1>
 
-<h1>Usuario logueado: @(CustomerState.FirstName + " " + CustomerState.LastName)</h1>
-
-
-@if (ShowWeaterComponent)
-{
-    <WeatherComponent />
-}
-
+<h2>Formulario 1</h2>
 <CustomerForm/>
+
+<h2>Formulario 2</h2>
+<CustomerForm />
+
+<h2>Formulario 3</h2>
+<CustomerForm />
