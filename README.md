@@ -1,38 +1,44 @@
-# Biblioteca BlazorState
+# BlazorState Project
 
-BlazorState es una biblioteca de gestión de estado diseñada para facilitar la implementación de patrones de gestión de estado como Flux, Redux y Observable en aplicaciones Blazor. Al aprovechar la biblioteca `CommunityToolkit.Mvvm`, BlazorState proporciona un mecanismo robusto para manejar cambios de estado y asegurar que tu interfaz de usuario se mantenga reactiva y eficiente.
+Este proyecto utiliza Blazor para crear una aplicación web con un patrón de gestión de estado. La clase base BaseState<T> proporciona un mecanismo para implementar patrones de gestión de estado como Flux, Redux y Observable. Esta clase facilita la gestión del estado en tu aplicación Blazor aprovechando la biblioteca CommunityToolkit.Mvvm para notificaciones de cambios de propiedades.
 
-## Características
+# BaseState<T>
+La clase BaseState<T> implementa la interfaz INotifyPropertyChanged, lo que permite a las clases derivadas notificar a la interfaz de usuario sobre los cambios en las propiedades, habilitando actualizaciones de estado reactivas y eficientes.
+Métodos y Propiedades
 
-- **Gestión de Estado**: Implementa patrones de gestión de estado como Flux, Redux y Observable.
-- **Notificaciones de Cambio de Propiedad**: Utiliza la biblioteca `CommunityToolkit.Mvvm` para notificar a la interfaz de usuario sobre cambios de propiedad.
-- **Actualizaciones Reactivas de la UI**: Asegura que tu interfaz de usuario se actualice de manera eficiente en respuesta a cambios de estado.
+    •   NotifyPropertyChanged: Notifica a los oyentes cuando una propiedad cambia.
+    •   SubscribeToAnyChange: Se suscribe a cualquier cambio de propiedad en el estado.
+    •   SubscribeToPropertyChange: Se suscribe a los cambios de una propiedad específica.
 
 
-### Uso
+### Ejemplo de Uso
 
-1. **Define tu Clase de Estado**
+1. **Implementación en CustomerState**
 
-   Crea una clase de estado que herede de `BaseState<T>`. Utiliza el atributo `[ObservableProperty]` para definir propiedades que deben notificar a la interfaz de usuario sobre cambios.
-
+    La clase CustomerState hereda de BaseState<CustomerState> y define dos propiedades: FirstName y LastName.
+    Estas propiedades notifican a la interfaz de usuario cuando cambian, utilizando el método
+    NotifyPropertyChanged de la clase base.
+    
     ```
-    using CommunityToolkit.Mvvm.ComponentModel;
-    
-    namespace BlazorState.Test.Web.Store.States 
-    { 
-    
-        public partial class CustomerState : BaseState<CustomerState> 
-        { 
-            [ObservableProperty]
-            private string firstName;
-            
-            [ObservableProperty]
-            private string lastName;
-            
+        public class CustomerState : BaseState<CustomerState>
+        {
+            private string firstName = string.Empty;
+            private string lastName = string.Empty;
+        
+            public string FirstName
+            {
+                get { return firstName; }
+                set { firstName = value; NotifyPropertyChanged(); }
+            }
+        
+            public string LastName
+            {
+                get { return lastName; }
+                set { lastName = value; NotifyPropertyChanged(); }
+            }
         }
-    }
     ```
-
+    
 2. **Registra tu state**
 
     Para que el estado estado persista dentro de tu aplicacion debes registrar en IoC
@@ -40,30 +46,63 @@ BlazorState es una biblioteca de gestión de estado diseñada para facilitar la 
     ```
     builder.Services.AddScoped<CustomerState>();
     ```
+3. **Uso en un Componente Blazor**
 
-
-3. **Suscríbete a Cambios de Propiedad**
-
-   En tus componentes Blazor, suscríbete a cambios de propiedad utilizando el método `SubscribeToPropertyChange`. Esto asegura que tu componente se actualice cuando el estado cambie.
-   
+    En este ejemplo, el componente CustomerForm utiliza CustomerState para enlazar y actualizar las propiedades
+    firstName y lastName. Se suscribe a los cambios de estado para actualizar la interfaz de usuario cuando las
+    propiedades de CustomerState cambian.
+    
     ```
-    @page "/" 
+    @using BlazorState.Test.Web.Store.States
     @inject CustomerState CustomerState
     
-    <h3>Cliente</h3> <p>Nombre: @CustomerState.FirstName</p>
+    <label>Nombres</label>
+    <input @bind-value="firstName">
     
-    <p>Apellido: @CustomerState.LastName</p>
+    <label>Apellidos</label>
+    <input @bind-value="lastName">
     
-    @code { 
+    <button @onclick="Save">Guardar</button>
     
-        protected override void OnInitialized() 
-        { 
-            CustomerState.SubscribeToPropertyChange(state => state.FirstName, StateHasChanged);
-            
-            CustomerState.SubscribeToPropertyChange(state => state.LastName, StateHasChanged); 
-            
-            base.OnInitialized(); 
-        } 
+    @code {
+        string firstName = string.Empty;
+        string lastName = string.Empty;
+    
+        protected override void OnInitialized()
+        {
+            firstName = CustomerState.FirstName;
+            lastName = CustomerState.LastName;
+    
+            CustomerState.SubscribeToAnyChange(() =>
+            {
+                if (string.IsNullOrEmpty(CustomerState.FirstName) == false)
+                {
+                    firstName = CustomerState.FirstName;
+                }
+    
+                if (string.IsNullOrEmpty(CustomerState.LastName) == false)
+                {
+                    lastName = CustomerState.LastName;
+                }
+                
+                StateHasChanged();
+            });
+    
+            base.OnInitialized();
+        }
+    
+        void Save()
+        {
+            if (string.IsNullOrEmpty(firstName) == false)
+            {
+                CustomerState.FirstName = firstName;
+            }
+    
+            if (string.IsNullOrEmpty(lastName) == false)
+            {
+                CustomerState.LastName = lastName;
+            }
+        }
     }
-    ```
 
+    ```
