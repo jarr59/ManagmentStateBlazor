@@ -24,7 +24,7 @@ namespace BlazorState
     /// }
     /// 
     /// var customerState = new CustomerState();
-    /// customerState.SubscribeToPropertyChange(state => state.FirstName, () => StateHasChanged -> Is method from blazor component);
+    /// customerState.SubscribeToPropertyChange(state => state.FirstName, StateHasChanged -> Is method from blazor component);
     /// </code>
     /// </summary>
     /// <typeparam name="T">The type of the derived state class.</typeparam>
