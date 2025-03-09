@@ -1,0 +1,38 @@
+﻿@using BlazorState.Test.Web.Store.States
+@inject CustomerState CustomerState
+
+<label>Nombres</label>
+<input @bind-value="firstName">
+
+<label>Apellidos</label>
+<input @bind-value="lastName">
+
+<button @onclick="Save">Guardar</button>
+
+@code {
+    string firstName = string.Empty;
+    string lastName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        firstName = CustomerState.FirstName;
+        lastName = CustomerState.LastName;
+
+        base.OnInitialized();
+    }
+
+    void Save()
+    {
+        if (string.IsNullOrEmpty(firstName) == false)
+        {
+            CustomerState.FirstName = firstName;
+        }
+
+        if (string.IsNullOrEmpty(lastName) == false)
+        {
+            CustomerState.LastName = lastName;
+        }
+        
+        
+    }
+}

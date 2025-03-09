@@ -1,0 +1,19 @@
+﻿@page "/"
+@using BlazorState.Test.Web.Components.Shared
+@rendermode @( new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<h1>Usuario logueado: @(CustomerState.FirstName + " " + CustomerState.LastName)</h1>
+
+
+@if (ShowWeaterComponent)
+{
+    <WeatherComponent />
+}
+
+<CustomerForm/>
